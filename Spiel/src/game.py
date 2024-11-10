@@ -6,20 +6,26 @@ import time
 import random
 from src.map import Map
 from src.player import Player
+from src.network import Network
 
 class Game:
-    def __init__(self):
-        self.screen_width = 800
-        self.screen_height = 600
+    def __init__(self, network):
+        # Map-Daten von der Network-Instanz abrufen
+        map_data = network.get_map()
+
+        # Map-Daten speichern
+        self.screen_width = map_data["screen_width"]
+        self.screen_height = map_data["screen_height"]
         self.tile_size = 64  # Größe eines Tiles (Felds)
+        self.grid = map_data["grid"]  # Das 2D-Grid mit 'mountain' und 'grass'
         
         # Initialisiere das Pygame-Fenster
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Mein Spiel mit Runden")
         self.clock = pygame.time.Clock()
-        
+                
         # Erstelle die Map
-        self.map = Map(self.screen_width // self.tile_size, self.screen_height // self.tile_size, self.tile_size)
+        self.map = Map(self.screen_width // self.tile_size, self.screen_height // self.tile_size, self.tile_size, self.grid)
         
         # Spieler-Startposition auf einem grünen Wiesenfeld setzen
         self.player = self.create_player_on_grass_field()

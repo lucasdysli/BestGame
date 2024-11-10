@@ -2,9 +2,11 @@
 import pygame
 import sys
 from src.game import Game  # Importiere die Game-Klasse
+from src.network import Network
 
 # Pygame initialisieren und Spiel starten
 pygame.init()
-game = Game()
+network = Network()
+game = Game(network)
 game.run()
 sys.exit()

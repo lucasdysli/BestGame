@@ -1,7 +1,7 @@
 # src/player.py
 
-# src/player.py
 import pygame
+from src.network import Network
 
 class Player:
     def __init__(self, x, y, tile_size, map_ref):
