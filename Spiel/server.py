@@ -1,4 +1,5 @@
 import socket
+import time
 from _thread import *
 import sys
 import random
@@ -10,8 +11,11 @@ port = 5555
 
 
 class Server:
-    def __init__(self, width=800, height=600):
+    def __init__(self, width=800, height=600, move_delay=5):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.player_count = 0  # Zählvariable für die Spieler-IDs
+        self.move_delay = move_delay
+        self.last_move_time = time.time()
 
         try:
             self.s.bind((server, port))
@@ -44,22 +48,30 @@ class Server:
             start_new_thread(self.threaded_client, (conn,))
 
     def threaded_client(self, conn):
-        # Verpacke die Map-Daten
-        map_data = {
+        # Inkrementiere eine Zählvariable und weise eine Spieler-ID zu
+        self.player_count += 1
+        player_id = self.player_count
+        print(f"Spieler {player_id} verbunden.")
+
+        # Verpacke die Server-Daten
+        server_data = {
             "screen_width": self.screen_width,
             "screen_height": self.screen_height,
-            "grid": self.grid
+            "grid": self.grid,
+            "player_id": player_id  # Spieler-ID hinzufügen
         }
-        conn.send(pickle.dumps(map_data))  # Serialisierte Map-Daten senden
-        conn.send(str.encode("Connected"))
-        reply = ""
+        conn.send(pickle.dumps(server_data))  # Serialisierte Server-Daten senden
+
+
         while True:
+
             try:
                 data = conn.recv(2048)
                 reply = data.decode("utf-8")
+                
 
                 if not data:
-                    print("Disconnected")
+                    print("Spieler", player_id, "disconnected")
                     break
                 else:
                     print("Received: ", reply)

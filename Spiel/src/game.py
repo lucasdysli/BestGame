@@ -1,6 +1,5 @@
 # src/game.py
 
-# src/game.py
 import pygame
 import time
 import random
