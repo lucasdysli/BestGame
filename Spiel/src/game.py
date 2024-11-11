@@ -3,12 +3,17 @@
 import pygame
 import time
 import random
+import socket
 from src.map import Map
 from src.player import Player
 from src.network import Network
 
 class Game:
     def __init__(self, network):
+        
+        self.network = network
+        self.move_direction = None  # Variable für die Bewegungsrichtung
+
         # Map-Daten von der Network-Instanz abrufen
         map_data = network.get_map()
 
@@ -28,11 +33,7 @@ class Game:
         
         # Spieler-Startposition auf einem grünen Wiesenfeld setzen
         self.player = self.create_player_on_grass_field()
-        
-        # Timer-Variablen
-        self.last_move_time = time.time()  # Zeit der letzten Bewegung
-        self.move_delay = 5  # 5 Sekunden warten vor der nächsten Bewegung
-        self.move_direction = None  # Variable für die Bewegungsrichtung
+
 
     def create_player_on_grass_field(self):
         # Suche zufällig ein Wiesenfeld ('grass')
@@ -56,14 +57,16 @@ class Game:
             # Tastenstatus abfragen
             keys = pygame.key.get_pressed()
 
-            # Überprüfen, ob 5 Sekunden vergangen sind und die Bewegung ausgeführt werden soll
-            current_time = time.time()
-            if current_time - self.last_move_time >= self.move_delay:
-                if self.move_direction:  # Wenn eine Richtung gewählt wurde
-                    self.player.move(self.move_direction)  # Führe die Bewegung aus
-                    self.move_direction = None  # Setze die Bewegungsrichtung zurück
-                self.last_move_time = current_time  # Setze den Timer zurück
+            #Führe die Bewegung aus, sobald Server sendet
+            if self.network.ready_check():
+                self.player.move(self.move_direction)  # Führe die Bewegung aus
+                self.network.move_done()
 
+                #Melde neue Position zurück an den Server
+                x,y = self.player.get_position()
+                position_dict = {"x": x, "y": y}
+                self.network.send(position_dict)
+            
             # Spiellogik: Warte auf eine Eingabe für die Richtung
             if keys[pygame.K_LEFT]:
                 self.move_direction = "left"
@@ -75,7 +78,8 @@ class Game:
                 self.move_direction = "down"
 
             # Bildschirm aktualisieren
-            self.screen.fill((255, 255, 255))  # Hintergrundfarbe weiß
+            
+            self.screen.fill((255, 255, 255))  # Hintergrundfarbe weiß           
             self.map.draw(self.screen)  # Zeichne die Map
             self.player.draw(self.screen)  # Zeichne die Spielfigur
             pygame.display.flip()

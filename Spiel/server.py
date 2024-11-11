@@ -62,24 +62,37 @@ class Server:
         }
         conn.send(pickle.dumps(server_data))  # Serialisierte Server-Daten senden
 
+        conn.setblocking(False)  # Setze den Socket in den nicht-blockierenden Modus
 
         while True:
-
+            # Überprüfen, ob 5 Sekunden vergangen sind und die Bewegung ausgeführt werden soll
+            current_time = time.time()
+            if current_time - self.last_move_time >= self.move_delay:
+                conn.send(str.encode("ready_to_move"))
+                print("gesendet")
+                self.last_move_time = time.time()  # Setze den Timer zurück
+            else:
+                time.sleep(0.1)
+                
             try:
                 data = conn.recv(2048)
-                reply = data.decode("utf-8")
+                data_deserialised = pickle.loads(data)
                 
-
                 if not data:
                     print("Spieler", player_id, "disconnected")
                     break
                 else:
-                    print("Received: ", reply)
-                    print("Sending: ", reply)
+                    print("Received: ", data_deserialised)
+                    print("Sending: ", data_deserialised)
 
-                conn.sendall(str.encode(reply))
+                """ conn.sendall(str.encode(reply)) """
+
+            except BlockingIOError:
+                # Keine Daten verfügbar, weiter zum nächsten Schleifendurchlauf
+                continue
+
             except:
-                break
+                continue
     """     print("Connection lost")
         conn.close() """
 

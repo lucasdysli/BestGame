@@ -44,3 +44,6 @@ class Player:
     def draw(self, screen):
         # Zeichne die Spielfigur auf dem Bildschirm
         pygame.draw.circle(screen, self.color, (self.x + self.tile_size // 2, self.y + self.tile_size // 2), self.size)
+
+    def get_position(self):
+        return self.x, self.y
