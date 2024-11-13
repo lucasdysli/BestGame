@@ -8,8 +8,9 @@ class Player:
         self.tile_size = tile_size  # Größe der Felder
         self.x = x  # Startposition x
         self.y = y  # Startposition y
-        self.color = (0, 128, 255)  # Blau
-        self.size = 20  # Größe der Spielfigur (optional)
+        self.own_color = (0, 128, 255)  # Blau
+        self.other_color = (255, 0, 0)  # Rot
+        self.size = 10  # Größe der Spielfigur (optional)
         self.speed = self.tile_size  # Die Geschwindigkeit entspricht der Feldgröße
         self.map = map_ref  # Referenz auf die Map, um Felder zu prüfen
 
@@ -28,7 +29,7 @@ class Player:
             new_y += self.speed
 
         # Überprüfe, ob das Zielfeld ein Gebirgsfeld ist
-        if self.map.get_tile_type(new_x, new_y) != "mountain":
+        if self.map.get_tile_type(new_x, new_y) != "m":
             # Wenn das Zielfeld kein Gebirgsfeld ist, führe die Bewegung aus
             self.x = new_x
             self.y = new_y
@@ -41,6 +42,16 @@ class Player:
         self.x = round(self.x / self.tile_size) * self.tile_size
         self.y = round(self.y / self.tile_size) * self.tile_size
 
-    def draw(self, screen):
-        # Zeichne die Spielfigur auf dem Bildschirm
-        pygame.draw.circle(screen, self.color, (self.x + self.tile_size // 2, self.y + self.tile_size // 2), self.size)
+    def draw(self, screen, player_positions):
+        # Zeichne die Spielfigur des eigenen Spielers
+        pygame.draw.circle(screen, self.own_color, (self.x + self.tile_size // 2, self.y + self.tile_size // 2), self.size)
+        
+        # Zeichne die Spielfiguren der anderen Spieler
+        for player_id, position in player_positions.items():
+            # hole die x- und y-Koordinaten des aktuellen Spielers
+            player_x = position['x']
+            player_y = position['y']
+            pygame.draw.circle(screen, self.other_color, (player_x + self.tile_size // 2, player_y + self.tile_size // 2), self.size)
+
+    def get_position(self):
+        return self.x, self.y

@@ -29,9 +29,9 @@ class Map:
                 y = row * self.tile_size
                 
                 # Zeichne das entsprechende Bild je nach Tile-Typ
-                if tile_type == "grass":
+                if tile_type == "g":
                     screen.blit(self.grass_image, (x, y))  # Wiesenbild
-                elif tile_type == "mountain":
+                elif tile_type == "m":
                     screen.blit(self.mountain_image, (x, y))  # Gebirgsbild
     
     def get_tile_type(self, x, y):

@@ -1,7 +1,7 @@
 # main.py
 import pygame
 import sys
-from src.game import Game  # Importiere die Game-Klasse
+from src.game import Game  
 from src.network import Network
 
 # Pygame initialisieren und Spiel starten
